@@ -7,46 +7,38 @@ import java.sql.ResultSetMetaData;
 
 public class SectionDAO {
     // INSERT YOUR CODE HERE
-    private static final String QUERY_FIND = "SELECT * FROM section WHERE subjectid = ? AND num = ? AND termid = ? ORDER by CRN";
+    private static final String QUERY_FIND = "SELECT * FROM section WHERE subjectid = ? AND num = ?";
     private final DAOFactory daoFactory;
-    
+
     SectionDAO(DAOFactory daoFactory) {
         this.daoFactory = daoFactory;
     }
-    
+
     public String find(int termid, String subjectid, String num) {
-        
+
         String result = "[]";
         
         PreparedStatement ps = null;
         ResultSet rs = null;
-        ResultSetMetaData rsmd = null;
         
         try {
-            
+
             Connection conn = daoFactory.getConnection();
             
-            if (conn.isValid(0)) {
+            if (conn.isValid(0)) {          
                 // INSERT YOUR CODE HERE
                 ps = conn.prepareStatement(QUERY_FIND);
-                
-                ps.setInt(1, termid);
-                ps.setString(2,subjectid);
-                ps.setString(3, num);
-                
-                boolean hasresults = ps.execute();
-                if (hasresults){
+                ps.setString(1, subjectid);
+                ps.setString(2, num);
+                //fixed ,wasn't needed
+                boolean hasResults = ps.execute();
+                if (hasResults) {
                     rs = ps.getResultSet();
-                    while(rs.next()){
-                        result.concat(DAOUtility.getResultSetAsJson(rs));
-                    }
-                }
-                
+                    result = DAOUtility.getResultSetAsJson(rs);
+                }        
             }
-            
-        }
-        
-        catch (Exception e) { e.printStackTrace(); }
+
+        } catch (Exception e) { e.printStackTrace(); }
         
         finally {
             
@@ -54,9 +46,9 @@ public class SectionDAO {
             if (ps != null) { try { ps.close(); } catch (Exception e) { e.printStackTrace(); } }
             
         }
-        
+                
         return result;
-        
+
     }
-    
+
 }
